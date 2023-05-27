@@ -13,8 +13,14 @@ def seach():
     query = data['query']
     response = requests.get(query)
     if response.status_code == 200:
-        search_html = response.text
-        return Response(dumps({'data': search_html}), mimetype='application/json')
+        response_text = response.text
+        soup = BeautifulSoup(response_text, 'html.parser')
+        for script in soup.find_all('script'):
+            script.decompose()
+        html_processado = str(soup)
+
+        return Response(dumps({'data': html_processado}), mimetype='application/json')
+    else: return Response(dumps({'data':[], 'message':'um erro ocorreu'}), mimetype='application/json')
 
 if __name__ ==  '__main__':
     app.run()
